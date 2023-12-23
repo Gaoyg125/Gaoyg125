@@ -1,14 +1,14 @@
 /*
 * 53. 最大子数组和
-* 给你一个整数数组 nums ，请你找出一个具有最大和的连续子数组（子数组最少包含一个元素），返回其最大和。
+* 给你一个整数数组 nums ，请你找出一个具有最大和的连续子数组（子数组最少包含一个元素），返回其最大和。并返回子数组的起始索引。
 * 子数组 是数组中的一个连续部分。
 * Case1: 
 * 输入：nums = [-2,1,-3,4,-1,2,1,-5,4]
-* 输出：6
+* 输出：6, 3, 6
 * 解释：连续子数组 [4,-1,2,1] 的和最大，为 6 。
 * Case2:
 * 输入：nums = [-1]
-* 输出：-1
+* 输出：-1, 0, 0
 *
 */
 
@@ -19,13 +19,16 @@
 
 #include <stdio.h>
 
-int maxSubArray(int* nums, int numsSize) {
+int maxSubArray(int* nums, int numsSize, int *start, int *end) {
     int curr_sum;
     int max_sum;
     int idx;
+    int startTemp;
 
     curr_sum = 0;
     max_sum = -32767;
+    startTemp = 0;
+    *end = 0;
     
     for(idx = 0; idx < numsSize; idx++)
     {
@@ -33,18 +36,36 @@ int maxSubArray(int* nums, int numsSize) {
         if(curr_sum > max_sum)
         {
             max_sum = curr_sum;
+            (*start) = startTemp;
+            (*end) = idx;
         }
         if(curr_sum < 0)
         {
             curr_sum = 0;
+            startTemp = idx + 1;
         }
     }
     return max_sum;
 }
 
-void cmp(int resultOut, int resultRef,int CaseNum)
+void cmp(int *presultOut, int *presultRef,int CaseNum, int len)
 {
-    if(resultOut == resultRef)
+    int idx;
+    int resultOut;
+    int resultRef;
+    int ErrCnt;
+
+    ErrCnt = 0;
+    for(idx = 0; idx < len; idx++)
+    {
+        resultOut = *(presultOut + idx);
+        resultRef = *(presultRef + idx);
+        if(resultOut != resultRef)
+        {
+            ErrCnt++;
+        }
+    }
+    if (ErrCnt == 0)
     {
         printf("Case %d is pass!\n", CaseNum);
     }
@@ -52,22 +73,23 @@ void cmp(int resultOut, int resultRef,int CaseNum)
     {
         printf("Case %d is fail!\n", CaseNum);
     }
+    
 }
 
 void main()
 {
     int nums1[9] = {-2,1,-3,4,-1,2,1,-5,4};
     int nums2[1] = {-1};
-    int maxSum;
     int len;
-    int result1 = 6;
-    int result2 = -1;
+    int result1[3] = {6,3,6};
+    int result2[3] = {-1,0,0};
+    int resultOut[3];
 
     len = sizeof(nums1)/sizeof(nums1[0]);
-    maxSum = maxSubArray(&nums1, len);
-    cmp(maxSum, result1,1);
+    resultOut[0] = maxSubArray(&nums1[0], len,&resultOut[1],&resultOut[2]);
+    cmp(&resultOut[0], &result1[0],1,3);
 
     len = sizeof(nums2)/sizeof(nums2[0]);
-    maxSum = maxSubArray(&nums2, len);
-    cmp(maxSum, result2,2);
+    resultOut[0] = maxSubArray(&nums2[0], len,&resultOut[1],&resultOut[2]);
+    cmp(&resultOut[0], &result2[0],2,3);
 }
